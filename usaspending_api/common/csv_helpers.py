@@ -56,6 +56,7 @@ def partition_large_delimited_file(
         current_out_path = os.path.join(output_path, output_name_template % partition_number)
         new_csv_list.append(current_out_path)
         dest_csv = None
+        line_number = 0
         try:
             dest_csv = open(current_out_path, "w")
             current_partition_writer = csv.writer(dest_csv, delimiter=delimiter)
