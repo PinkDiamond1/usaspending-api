@@ -333,9 +333,9 @@ def parse_source(source, columns, download_job, working_dir, piid, assistance_id
         # Log how many rows we have
         write_to_log(message="Counting rows in delimited text file", download_job=download_job)
         try:
-            download_job.number_of_rows += count_rows_in_delimited_file(
-                filename=source_path, has_header=True, delimiter=delim
-            )
+            number_of_rows = count_rows_in_delimited_file(filename=source_path, has_header=True, delimiter=delim)
+            write_to_log(message=f"Number of rows in delimited text file: {number_of_rows}", download_job=download_job)
+            download_job.number_of_rows += number_of_rows
         except Exception:
             write_to_log(
                 message="Unable to obtain delimited text file line count", is_error=True, download_job=download_job
@@ -376,7 +376,11 @@ def split_and_zip_data_files(zip_file_path, source_path, data_file_name, file_fo
             output_template = f"{data_file_name}_%s.{extension}"
             write_to_log(message="Beginning the delimited text file partition", download_job=download_job)
             list_of_files = partition_large_delimited_file(
-                file_path=source_path, delimiter=delim, row_limit=EXCEL_ROW_LIMIT, output_name_template=output_template
+                file_path=source_path,
+                delimiter=delim,
+                row_limit=EXCEL_ROW_LIMIT,
+                output_name_template=output_template,
+                download_job=download_job,
             )
             span.set_tag("file_parts", len(list_of_files))
 

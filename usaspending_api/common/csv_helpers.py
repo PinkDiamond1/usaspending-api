@@ -3,6 +3,7 @@ import csv
 import os
 
 from usaspending_api.common.retrieve_file_from_uri import RetrieveFileFromUri
+from usaspending_api.download.helpers import write_to_download_log as write_to_log
 
 
 def count_rows_in_delimited_file(filename, has_header=True, safe=True, delimiter=","):
@@ -30,7 +31,12 @@ def count_rows_in_delimited_file(filename, has_header=True, safe=True, delimiter
 
 # Function inspired by Ben Welsh: https://gist.github.com/palewire/596056
 def partition_large_delimited_file(
-    file_path: str, delimiter=",", row_limit=10000, output_name_template="output_%s.csv", keep_headers=True
+    download_job,
+    file_path: str,
+    delimiter=",",
+    row_limit=10000,
+    output_name_template="output_%s.csv",
+    keep_headers=True,
 ):
     """Splits a delimited file into multiple partitions if it exceeds the row limit.
 
@@ -72,7 +78,10 @@ def partition_large_delimited_file(
                         current_partition_writer.writerow(headers)
 
                 current_partition_writer.writerow(row)
+        except Exception as e:
+            write_to_log(message=f"Error during partitioning: {e}", download_job=download_job)
         finally:
+            write_to_log(message=f"Number of lines in original COPY CSV: {line_number}", download_job=download_job)
             if dest_csv and not dest_csv.closed:
                 dest_csv.close()
 
