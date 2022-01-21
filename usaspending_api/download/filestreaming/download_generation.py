@@ -635,6 +635,7 @@ def execute_psql(temp_sql_file_path, source_path, download_job):
             )
         except subprocess.CalledProcessError as e:
             logger.error(f"PSQL Error: {e.output.decode()}")
+            write_to_log(message=f"PSQL Error: {e.output.decode()}", download_job=download_job)
         except Exception as e:
             if not settings.IS_LOCAL:
                 # Not logging the command as it can contain the database connection string
